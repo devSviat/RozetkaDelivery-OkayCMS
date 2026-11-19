@@ -1,0 +1,37 @@
+{
+  "Okay": "4.5.3",
+  "version": "1.0.0",
+  "moduleName": "RozetkaDelivery",
+  "vendor": {
+    "email": "devsviat@proton.me",
+    "site": "https://github.com/devSviat"
+  },
+  "modifications": {
+    "front": [
+      {
+        "file": "order.tpl",
+        "changes": [
+          {
+            "find": "{if $delivery}",
+            "append": "order_delivery.tpl"
+          }
+        ]
+      }
+    ],
+    "backend": [
+      {
+        "file": "orders.tpl",
+        "changes": [
+          {
+            "find": "<option data-item=\"remove\" value=\"delete\">",
+            "appendBefore": "orders_action_option.tpl"
+          },
+          {
+            "find": "{* Visited info *}",
+            "appendBefore": "mass_result.tpl"
+          }
+        ]
+      }
+    ]
+  }
+}

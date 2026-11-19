@@ -1,0 +1,109 @@
+.rz-parcel { margin-bottom: 12px; }
+.rz-parcel__head { margin-bottom: 8px; }
+.rz-parcel--card .rz-parcel__head { margin-bottom: 15px; }
+.rz-parcel__caps { margin: 10px 0 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--ok-ink-muted, #676e75); }
+.rz-parcel__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 6px; }
+.rz-parcel__grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rz-parcel__field { display: block; margin: 0 0 6px; }
+.rz-parcel__field .heading_label { display: block; margin-bottom: 2px; }
+.rz-parcel__error { display: block; font-size: 12px; color: var(--ok-danger, #c8352c); }
+.rz-parcel__error:empty { display: none; }
+.rz-parcel__invalid { border-color: var(--ok-danger, #c8352c) !important; }
+.rz-parcel__line { margin-bottom: 6px; font-size: 14px; line-height: 1.35; }
+.rz-parcel__label { display: block; font-size: 12px; color: var(--ok-ink-muted, #676e75); }
+.rz-parcel__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.rz-parcel__row { display: flex; gap: 8px; margin-top: 8px; }
+.rz-parcel__attach[hidden], .rz-parcel__candidates[hidden] { display: none; }
+.rz-parcel__candidates { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.rz-parcel__candidate { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; border: 1px solid var(--ok-line, #e4e6e9); border-radius: 6px; font-size: 14px; }
+.rz-parcel__unlink { margin-top: 12px; }
+.rz-parcel__unlink p { margin-bottom: 6px; font-size: 12px; }
+.rz-parcel__issues .alert, .rz-parcel__notices .alert, .rz-parcel__auth { margin-top: 8px; }
+.rz-parcel__issues .alert:last-child { margin-bottom: 8px; }
+/* Уся посилка в рамці, як картка NP (waybill.css) і Ukrposhta: шапка, тіло, «Показати більше» й футер розділені лініями на всю ширину.
+   Лінія — зверху кожної частини після шапки: тіла без фактів картка не друкує, і подвійної лінії не буває. */
+.rz-card { container-type: inline-size; border: 1px solid var(--ok-line, #e4e6e9); border-radius: 10px; background: var(--ok-surface, #fff); }
+.rz-card__top { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; }
+.rz-card__muted { font-size: 12px; color: var(--ok-ink-muted, #676e75); }
+.rz-card__head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+/* Знак «R» — нейтральна літера в колі, а не логотип: брендбук ROZETKA радить не перемальовувати його елементи. */
+.rz-logo { flex: none; display: block; width: auto; height: 14px; }
+/* Знак заввишки з цифру номера (Inter 600 26px: 19px) і стоїть на його базовій лінії; -4px дає 8px до номера замість gap 12px. */
+.rz-logo--card { height: 19px; align-self: baseline; margin-right: -4px; }
+.rz-card__head .rz-card__number { align-self: baseline; padding-left: 0; }
+.rz-card__number { border: 0; background: none; font: inherit; font-size: 26px; font-weight: 600; line-height: 1.2; color: var(--ok-ink, #23272b); cursor: copy; }
+.rz-card__number:hover, .rz-card__number.is-copied { color: var(--ok-accent, #135c94); }
+.rz-card__track { display: inline-flex; align-items: center; color: var(--ok-ink-muted, #676e75); }
+/* Номер — Inter 26px з line-height 1.2: центр цифр на 1.35px вище за центр рядка, на який стають інші елементи. */
+.rz-card__head .rz-parcel__badge, .rz-card__head .rz-card__track { transform: translateY(-1.35px); }
+.rz-card__track:hover, .rz-card__track:focus-visible { color: var(--ok-accent, #135c94); }
+.rz-card__event { font-size: 14px; line-height: 1.4; }
+.rz-card__dot::before { content: "·"; margin: 0 6px; color: var(--ok-ink-muted, #676e75); }
+.rz-card__body { padding: 16px 20px; border-top: 1px solid var(--ok-line, #e4e6e9); }
+.rz-card__facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px 20px; margin: 0; }
+.rz-card__facts dt { margin: 0 0 2px; font-size: 13px; font-weight: 400; color: var(--ok-ink-muted, #676e75); }
+.rz-card__facts dd { margin: 0; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.rz-card__more { border-top: 1px solid var(--ok-line, #e4e6e9); background: var(--ok-sunken, #f2f4f4); }
+.rz-card__more[hidden] { display: none; }
+.rz-card__more-inner { padding: 16px 20px; }
+.rz-card__issues .alert { margin: 12px 20px 0; }
+.rz-card__issues .alert:last-child { margin-bottom: 12px; }
+.rz-card__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--ok-line, #e4e6e9); font-size: 13px; }
+.rz-card__more-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 0; border-radius: 4px; background: #f5f5f5; color: #757575; font-size: 14px; font-weight: 500; cursor: pointer; }
+.rz-card__more-toggle:hover { background: #e7e7e7; }
+.rz-card__more-toggle svg { transition: transform .3s ease; }
+.rz-card__more-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.rz-card__tools { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-left: auto; }
+.rz-card__meta { margin-right: 2px; font-size: 12px; color: var(--ok-ink-muted, #676e75); }
+.rz-card__sep { width: 1px; height: 24px; margin: 0 4px; background: var(--ok-line, #e4e6e9); }
+.rz-card__label svg { margin-right: 4px; vertical-align: -3px; }
+.rz-card__icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--ok-ink-muted, #676e75); cursor: pointer; }
+.rz-card__icon:hover, .rz-card__icon:focus-visible { background: var(--ok-sunken, #eef0f3); color: var(--ok-ink, #212529); }
+.rz-card__icon--danger:hover, .rz-card__icon--danger:focus-visible { color: var(--ok-danger, #c8352c); }
+.rz-card__caps { margin: 14px 0 6px; font-size: 14px; font-weight: 600; text-transform: uppercase; color: var(--ok-ink, #212529); }
+.rz-card__facts + .rz-card__caps { margin-top: 14px; }
+.rz-card__more-inner > .rz-card__caps:first-child { margin-top: 0; }
+.rz-card__history { margin: 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.35; }
+.rz-card__history li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; padding: 5px 0; border-top: 1px solid #e3e6e6; }
+.rz-card__when { white-space: nowrap; color: var(--ok-ink-muted, #676e75); }
+@container (max-width: 440px) {
+    .rz-card__top, .rz-card__body, .rz-card__more-inner, .rz-card__footer { padding-left: 14px; padding-right: 14px; }
+    .rz-card__issues .alert { margin-left: 14px; margin-right: 14px; }
+    .rz-card__number { font-size: 20px; }
+    .rz-card__history li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .rz-card__meta { display: none; }
+}
+/* Тони бейджів ті самі, що в накладної NP, Ukrposhta й Meest: група ROZETKA лише обирає тон. */
+.rz-parcel__badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; background: #e2e3e5; color: #383d41; }
+.rz-parcel__badge--created, .rz-parcel__badge--accepted { background: #fff3cd; color: #856404; }
+.rz-parcel__badge--in_transit { background: #cfe2ff; color: #084298; }
+.rz-parcel__badge--arrived { background: #d1e2e7; color: #0f5132; }
+.rz-parcel__badge--received { background: #d1e7dd; color: #0f5132; }
+.rz-parcel__badge--problem, .rz-parcel__badge--refused, .rz-parcel__badge--returning, .rz-parcel__badge--returned { background: #f8d7da; color: #721c24; }
+.rz-parcel__badge--cancelled, .rz-parcel__badge--unsettled { background: #e2e3e5; color: #383d41; }
+.rz-parcel__check { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; font-size: 14px; }
+.rz-parcel__check[hidden] { display: none; }
+/* Рядок у списку замовлень: метрики ті самі, що в NP і Ukrposhta; номер починається на 21px (знак 16 + проміжок 5). */
+.rz-list-status { margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; }
+.okay_list .rz-list-status a.rz-list-status__track:not(.btn) { color: #646464; white-space: nowrap; text-decoration: none; }
+/* Номер — елемент ядра .fn_clipboard (його padding 0 2px); зліва 0, щоб проміжок від знака лишився 5px. */
+.rz-list-status .rz-list-status__track { padding-left: 0; }
+.okay_list .rz-list-status a.rz-list-status__track:not(.btn):hover { color: var(--ok-accent, #135c94); }
+.okay_list .rz-list-status a.rz-list-status__track.is-copied:not(.btn) { color: var(--ok-ink, #1f2328); }
+.rz-list-status .rz-parcel__badge { margin-left: 4px; padding: 3px 6px; font-size: 10px; line-height: 1; white-space: nowrap; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); }
+.rz-mass { display: flex; flex-direction: column; gap: 6px; }
+.rz-mass__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rz-mass__title { font-weight: 600; }
+.rz-mass__hide { background: none; border: 0; padding: 0; color: var(--ok-accent, #005893); text-decoration: underline; cursor: pointer; font: inherit; }
+.rz-mass__row--created { color: var(--ok-success, #227d3a); }
+.rz-mass__row--skipped { color: var(--ok-warning, #a35a00); }
+.rz-mass__row--failed { color: var(--ok-danger, #c8352c); }
+.rz-mass__note { padding: 8px 10px; border-radius: 6px; background: var(--ok-accent-soft, #e6f0f7); }
+.rz-parcel button.is-busy { cursor: progress; opacity: .7; }
+@media (max-width: 575px) {
+    .rz-parcel__grid { grid-template-columns: 1fr; }
+}
+.rz-parcel__hint, .rz-card__hint { display: block; margin: -2px 0 6px; font-size: 12px; color: var(--ok-ink-muted, #676e75); }
+.rz-card__hint { margin: 2px 0 0; }
+.rz-card__alert { margin: 0 20px 12px; }
+.rz-receptions__actions { display: flex; flex-wrap: wrap; gap: 6px; }

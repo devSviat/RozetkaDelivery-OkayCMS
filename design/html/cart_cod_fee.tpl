@@ -1,0 +1,1 @@
+{* Один рядок, без завершального перенесення: тема показує блок опису, щойно цей блок щось виводить. Скрипт кошика заповнює й показує рядок. *}{if $payment_method->sviat__rozetka__cod|default:0 == 1}<span class="rz-cod-line" data-rz-cod-payment="{$payment_method->id|escape}" hidden></span>{/if}

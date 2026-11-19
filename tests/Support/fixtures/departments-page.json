@@ -1,0 +1,87 @@
+{
+  "statusCode": 0,
+  "data": [
+    {
+      "id": "0A0B0C0D-1111-4000-8000-000000000001",
+      "name": "№10036, м. Тестове, вул. Вигадана, 5",
+      "public_name": "вул. Вигадана, 5",
+      "location": {
+        "city_id": "c1c1c1c1-0000-4000-8000-000000000001",
+        "city_name": "м. Тестове",
+        "region_id": "r1r1r1r1-0000-4000-8000-000000000001",
+        "region_name": "Умовна",
+        "district_id": "d1d1d1d1-0000-4000-8000-000000000001",
+        "district_name": "Умовний",
+        "street_name": "вул. Вигадана",
+        "house": "5"
+      },
+      "latitude": "50.1234567",
+      "longitude": "30.7654321",
+      "schedule": ["Пн: 08:30-18:00", "Вт: 08:30-18:00", "Ср: 08:30-18:00", "Чт: 08:30-18:00", "Пт: 08:30-18:00", "Сб: 09:00-15:00", "Нд: вихідний"],
+      "extra_schedule": [],
+      "limitations": {"cost": 60000, "weight": null, "volumeWeight": null},
+      "can_receive_tracks": true,
+      "can_give_out_tracks": true,
+      "carrier": "00000000-0000-4000-8000-0000000000aa",
+      "carrier_name": "Доставка",
+      "can_self_service": false,
+      "has_fast_delivery": false,
+      "department_type": {"id": 2, "name": "Точка видачі"},
+      "has_meest_delivery": false,
+      "number": "",
+      "comment": ""
+    },
+    {
+      "id": "0a0b0c0d-1111-4000-8000-000000000002",
+      "name": "10114 Яблунева 1 (тільки передоплата)",
+      "public_name": "вул. Яблунева, 1",
+      "location": {
+        "city_id": "c1c1c1c1-0000-4000-8000-000000000002",
+        "city_name": "с. Вишневе",
+        "region_id": "r1r1r1r1-0000-4000-8000-000000000001",
+        "region_name": "Умовна",
+        "district_id": "d1d1d1d1-0000-4000-8000-000000000002",
+        "district_name": "Інший",
+        "street_name": "вул. Яблунева",
+        "house": "1"
+      },
+      "latitude": "49.5",
+      "longitude": "31.25",
+      "schedule": ["Пн-Пт: 09:00-19:00"],
+      "extra_schedule": [{"start": {"date": "2026-12-31", "time": "09:00:00"}, "end": {"date": "2026-12-31", "time": "14:00:00"}}],
+      "limitations": {"cost": 20000, "weight": 10, "volumeWeight": 30},
+      "can_receive_tracks": false,
+      "can_give_out_tracks": true,
+      "carrier": "00000000-0000-4000-8000-0000000000aa",
+      "carrier_name": "Доставка",
+      "department_type": {"id": 14, "name": "Партнерське віділення"},
+      "number": "",
+      "comment": ""
+    },
+    {
+      "id": "0a0b0c0d-1111-4000-8000-000000000003",
+      "name": "Поштомат, м. Тестове, просп. Умовний, 12",
+      "public_name": "просп. Умовний, 12",
+      "location": {
+        "city_id": "c1c1c1c1-0000-4000-8000-000000000001",
+        "city_name": "м. Тестове",
+        "region_id": "r1r1r1r1-0000-4000-8000-000000000001",
+        "region_name": "Умовна",
+        "district_id": "d1d1d1d1-0000-4000-8000-000000000001",
+        "district_name": "Умовний",
+        "street_name": "просп. Умовний",
+        "house": "12"
+      },
+      "latitude": "50.2",
+      "longitude": "30.6",
+      "schedule": [],
+      "limitations": {"weight": 30, "volumeWeight": 40},
+      "can_receive_tracks": true,
+      "can_give_out_tracks": false,
+      "department_type": {"id": 10, "name": "Поштомат"},
+      "number": "",
+      "comment": ""
+    }
+  ],
+  "pagination": {"total_count": 3, "page_count": 1, "page": 1, "limit": 100}
+}
