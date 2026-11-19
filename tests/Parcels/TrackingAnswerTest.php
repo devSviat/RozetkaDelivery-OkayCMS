@@ -36,7 +36,7 @@ class TrackingAnswerTest extends TestCase
         self::assertSame('2027-01-16 07:00:00', $one[0]['last']->at, 'Kyiv time read into the app zone');
         self::assertCount(2, $one[0]['statuses']);
         self::assertSame(['101123456789', '101123456790'], array_column($many, 'track_id'));
-        self::assertSame(40040, $many[1]['last']->code, 'mapped by name, M3');
+        self::assertSame(40040, $many[1]['last']->code, 'mapped by name');
         self::assertSame('readyToIssueOctopus', $many[1]['last']->raw);
     }
 

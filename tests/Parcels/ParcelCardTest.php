@@ -40,7 +40,7 @@ class ParcelCardTest extends TestCase
         self::assertSame('26.01.2027 18:00', $card['expirationDate']);
         self::assertSame(['weight' => '1.5', 'sides' => '30×20×15', 'volume' => '0.009', 'description' => 'Замовлення №77', 'visibleId' => '77-3'], $card['more']);
         self::assertSame(['Відправлення у відділенні', 'Заплановано'], array_column($card['history'], 'name'));
-        self::assertNull($card['trackUrl'], 'no public tracking URL with the number is known (M16)');
+        self::assertNull($card['trackUrl'], 'no public tracking URL with the number is known');
     }
 
     public function testOnlyRealFacts(): void

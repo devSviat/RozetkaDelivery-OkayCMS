@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ParcelStatusTest extends TestCase
 {
-    /** Групи модуля за спекою §12.3: група Rozetka → група модуля, 10029 — окремо. */
+    /** Група Rozetka → група модуля; 10029 — окремо. */
     private const array EXPECTED = [
         100 => 'created', 200 => 'accepted', 300 => 'in_transit', 400 => 'cancelled', 500 => 'arrived',
         600 => 'refused', 700 => 'refused', 800 => 'refused', 900 => 'returning', 1000 => 'returning', 1100 => 'returning',

@@ -11,8 +11,12 @@ class CodSettings
     private const float FEE_FIXED_MAX = 1000;
     private const float FEE_PERCENT_MAX = 100;
 
-    public function __construct(private readonly Settings $settings)
+    private readonly \Closure $now;
+
+    /** @param ?\Closure(): int $now */
+    public function __construct(private readonly Settings $settings, ?\Closure $now = null)
     {
+        $this->now = $now ?? time(...);
     }
 
     public function read(): CodConfig
@@ -46,6 +50,11 @@ class CodSettings
         $this->settings->set(CodConfig::ENABLED, empty($post['cod_enabled']) ? 0 : 1);
         $this->settings->set(CodConfig::FEE_FIXED, $fixed);
         $this->settings->set(CodConfig::FEE_PERCENT, $percent);
+        if ($fiscal !== CodConfig::FISCAL_SHOP) {
+            $this->settings->set(CodConfig::FISCAL_SHOP_SINCE, '');
+        } elseif ($this->read()->fiscal !== CodConfig::FISCAL_SHOP || empty($this->settings->get(CodConfig::FISCAL_SHOP_SINCE))) {
+            $this->settings->set(CodConfig::FISCAL_SHOP_SINCE, date('Y-m-d H:i:s', ($this->now)()));
+        }
         $this->settings->set(CodConfig::FISCAL, $fiscal);
 
         return [];

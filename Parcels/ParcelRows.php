@@ -66,6 +66,14 @@ interface ParcelRows
      */
     public function unfinished(string $createdSince, int $limit): array;
 
+    /**
+     * Повністю видані створені ЕН з післяплатою, оплату якої Rozetka ще не підтвердила, з подією не раніше
+     * `$eventSince` і не перевірені після `$checkedBefore`; спершу ті, що найдовше не перевірялися.
+     *
+     * @return list<object>
+     */
+    public function unpaidCod(string $eventSince, string $checkedBefore, int $limit): array;
+
     /** @param list<string> $trackIds ЕН, які Rozetka прийняла в реєстр (або null — прибрала з нього) */
     public function setReception(array $trackIds, ?int $receptionId): void;
 

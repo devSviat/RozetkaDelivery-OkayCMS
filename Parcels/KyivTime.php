@@ -2,7 +2,7 @@
 
 namespace Okay\Modules\Sviat\RozetkaDelivery\Parcels;
 
-/** Дати Rozetka приходять без поясу й читаються як київські (спека §14); база тримає час застосунку. */
+/** Дати Rozetka приходять без поясу й читаються як київські; база тримає час застосунку. */
 final class KyivTime
 {
     public const string ZONE = 'Europe/Kyiv';

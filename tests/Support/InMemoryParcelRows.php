@@ -129,6 +129,21 @@ final class InMemoryParcelRows implements ParcelRows
         return array_slice(array_values($due), 0, $limit);
     }
 
+    public function unpaidCod(string $eventSince, string $checkedBefore, int $limit): array
+    {
+        $due = array_filter($this->rows, static fn(object $row): bool => $row->state === PendingParcel::CREATED
+            && $row->track_id !== null
+            && $row->status_group === 'received'
+            && (int)$row->partial === 0
+            && (float)$row->cod_amount > 0
+            && $row->has_paid !== 1
+            && $row->event_at !== null && $row->event_at >= $eventSince
+            && ($row->checked_at === null || $row->checked_at <= $checkedBefore));
+        usort($due, static fn(object $a, object $b): int => [$a->checked_at ?? '', $a->id] <=> [$b->checked_at ?? '', $b->id]);
+
+        return array_slice(array_values($due), 0, $limit);
+    }
+
     public function setReception(array $trackIds, ?int $receptionId): void
     {
         foreach ($this->rows as $row) {

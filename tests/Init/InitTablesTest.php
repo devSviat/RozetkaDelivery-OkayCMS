@@ -36,7 +36,7 @@ class InitTablesTest extends TestCase
 
         self::assertSame([], array_values($updates));
         $manifest = json_decode((string)file_get_contents(dirname(__DIR__, 5) . '/Okay/Modules/Sviat/RozetkaDelivery/Init/module.json'), true);
-        self::assertSame('1.0.0', $manifest['version']);
+        self::assertSame('1.0.1', $manifest['version']);
         self::assertSame('4.5.3', $manifest['Okay']);
     }
 

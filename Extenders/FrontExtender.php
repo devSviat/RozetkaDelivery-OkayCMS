@@ -233,7 +233,7 @@ class FrontExtender implements ExtensionInterface
             $ids = is_array($delivery->payment_methods_ids ?? null) ? $delivery->payment_methods_ids : [];
             $cod = array_values(array_filter(array_map(intval(...), $ids), $this->codPayments->isCod(...)));
             $due = is_numeric($delivery->total_price_with_delivery ?? null) ? (float)$delivery->total_price_with_delivery : (float)($cart->total_price ?? 0);
-            // Нульова формула означає, що комісію платить магазин (спека 11.2a): рядок не показується.
+            // Нульова формула означає, що комісію платить магазин: рядок не показується.
             $showFee = $cod !== [] && ($config->feeFixed > 0 || $config->feePercent > 0);
             $view[(int)$delivery->id] = [
                 'payments' => implode(',', $cod),

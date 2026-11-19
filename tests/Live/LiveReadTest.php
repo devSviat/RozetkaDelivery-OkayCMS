@@ -53,7 +53,7 @@ class LiveReadTest extends TestCase
         );
     }
 
-    /** Відповідь на §6.5: статичний токен іде як Bearer. */
+    /** Rozetka приймає статичний токен як Bearer. */
     public function testVerify(): void
     {
         $data = $this->client->get('auth/verify')['data'];

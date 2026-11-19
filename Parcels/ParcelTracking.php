@@ -16,16 +16,24 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Статуси ЕН. Вебхуків Rozetka не має: тік пакетами питає `track/status` для незавершених ЕН. `has_paid`,
- * `payment_fee` і дати зберігання є лише в `track/{id}`, тож він іде поштучно й лише на переходах, з бюджетом на тік.
+ * `payment_fee` і дати зберігання є лише в `track/{id}`, тож він іде поштучно, з бюджетом на тік: на переходах і для
+ * виданих ЕН з післяплатою, доки Rozetka не підтвердить оплату.
  * Статусів замовлень модуль не змінює.
  */
 final class ParcelTracking
 {
     /** ЕН, що все ще в русі через два місяці, застрягла; повторні запити лише гальмують чергу. */
     public const int TRACK_FOR_DAYS = 60;
-    /** Скільки номерів у одному `track/status`: межу API не названо (М9), стартове значення. */
+    /** Скільки номерів у одному `track/status`: межу API не названо, стартове значення. */
     public const int BATCH = 20;
     public const int EXTRA_GETS = 10;
+    /**
+     * Видану ЕН з післяплатою без `has_paid = 1` тік перечитує з того, що лишилось від EXTRA_GETS, не частіше
+     * PAID_RECHECK_MINUTES і не довше PAID_RECHECK_DAYS від видачі: коли Rozetka ставить `has_paid`, не
+     * задокументовано, а без нього чек «при отриманні» не виставляється.
+     */
+    public const int PAID_RECHECK_DAYS = 14;
+    public const int PAID_RECHECK_MINUTES = 60;
     /** 25 пакетних запитів на тік: при 5 запитах/с це кілька секунд, а не весь тайм-аут задачі. */
     public const int PER_TICK = 500;
     /** Тайм-аут — це Unreachable, і він зупиняє тік: завислий API забирає 30 с, а не весь тік у 600 с. */
@@ -78,6 +86,7 @@ final class ParcelTracking
             foreach (array_chunk($this->rows->unfinished($since, self::PER_TICK), self::BATCH) as $batch) {
                 $this->pollBatch($batch, $extraLeft, $summary);
             }
+            $this->recheckPaid($extraLeft, $summary);
             $receptionsSince = date('Y-m-d H:i:s', ($this->now)() - self::RECEPTIONS_FOR_DAYS * 86400);
             foreach ($this->receptions->open($receptionsSince, self::RECEPTIONS_PER_TICK) as $reception) {
                 $this->receptionService->refresh((int)$reception->reception_id);
@@ -168,6 +177,37 @@ final class ParcelTracking
         // ЕН без відповіді теж позначаються перевіреними, щоб черга не стояла на них.
         foreach ($byTrack as $row) {
             $this->rows->saveEvent((int)$row->order_id, ['checked_at' => $stamp]);
+        }
+    }
+
+    /**
+     * @param array{polled: int, updated: int, extra: int} $summary
+     * @throws RozetkaApiException
+     */
+    private function recheckPaid(int &$extraLeft, array &$summary): void
+    {
+        if ($extraLeft <= 0) {
+            return;
+        }
+        $now = ($this->now)();
+        $rows = $this->rows->unpaidCod(
+            date('Y-m-d H:i:s', $now - self::PAID_RECHECK_DAYS * 86400),
+            date('Y-m-d H:i:s', $now - self::PAID_RECHECK_MINUTES * 60),
+            $extraLeft,
+        );
+        foreach ($rows as $row) {
+            $extraLeft--;
+            $summary['extra']++;
+            $values = [];
+            try {
+                $values = $this->details((string)$row->track_id);
+                $this->auth->clear(AuthFlags::TRACKING);
+            } catch (RozetkaApiException $e) {
+                if (!self::onlyThisRequest($e)) {
+                    throw $e;
+                }
+            }
+            $this->rows->saveEvent((int)$row->order_id, $values + ['checked_at' => $this->stamp()]);
         }
     }
 

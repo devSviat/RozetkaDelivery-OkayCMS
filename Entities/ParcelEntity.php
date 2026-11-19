@@ -80,6 +80,28 @@ class ParcelEntity extends Entity
             ->bindValue('rozetka_received_since', $since);
     }
 
+    /**
+     * Повністю видані ЕН з післяплатою без підтвердженої оплати, з подією не раніше `event_since` і не перевірені
+     * після `checked_before`.
+     *
+     * @param array{event_since: string, checked_before: string} $range
+     */
+    protected function filter__unpaid_cod(array $range): void
+    {
+        $alias = $this->getTableAlias();
+        $this->select->where("{$alias}.state = '" . PendingParcel::CREATED . "'")
+            ->where("{$alias}.track_id IS NOT NULL")
+            ->where("{$alias}.status_group = 'received'")
+            ->where("{$alias}.partial = 0")
+            ->where("{$alias}.cod_amount > 0")
+            // Явний IS NULL: NULL <> 1 дало б NULL, і ЕН без відповіді про оплату випала б із вибірки.
+            ->where("({$alias}.has_paid IS NULL OR {$alias}.has_paid <> 1)")
+            ->where("{$alias}.event_at >= :rozetka_unpaid_event_since")
+            ->where("({$alias}.checked_at IS NULL OR {$alias}.checked_at <= :rozetka_unpaid_checked_before)")
+            ->bindValue('rozetka_unpaid_event_since', $range['event_since'])
+            ->bindValue('rozetka_unpaid_checked_before', $range['checked_before']);
+    }
+
     /** Створені ЕН у групі `created` (чи ще без групи) без реєстру. */
     protected function filter__ready_for_reception(bool $on): void
     {
