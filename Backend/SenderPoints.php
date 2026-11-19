@@ -49,9 +49,9 @@ class SenderPoints
         if ($pointId === '') {
             return null;
         }
-        $point = $this->entityFactory->get(PointEntity::class)->cols(['city_id'])->findOne(['id' => $pointId, 'can_receive' => 1]);
+        $cityId = $this->entityFactory->get(PointEntity::class)->cols(['city_id'])->findOne(['id' => $pointId, 'can_receive' => 1]);
 
-        return $point ? (string)$point->city_id : null;
+        return is_string($cityId) && $cityId !== '' ? $cityId : null;
     }
 
     /** @return array{id:string, name:string, type:string, region:string}|null */

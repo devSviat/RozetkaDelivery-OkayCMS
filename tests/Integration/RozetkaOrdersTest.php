@@ -121,7 +121,8 @@ class RozetkaOrdersTest extends TestCase
         $factory = $this->parcelFactory(static function (array $filter) use (&$captured): array {
             $captured = $filter;
 
-            return [(object)['order_id' => '9'], (object)['order_id' => '4']];
+            // Сутність з однією колонкою в cols() віддає значення, а не рядки.
+            return ['9', '4', '9'];
         });
 
         $ids = $this->facade($factory)->receivedCodSince('2026-11-01 00:00:00');

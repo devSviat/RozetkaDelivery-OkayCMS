@@ -18,6 +18,9 @@ use Modules\Sviat\RozetkaDelivery\Support\ArraySettings;
 use Modules\Sviat\RozetkaDelivery\Support\InMemoryReceptions;
 use Okay\Modules\Sviat\RozetkaDelivery\Receptions\ReceptionService;
 use Okay\Core\Scheduler\Schedule;
+use Okay\Modules\Sviat\RozetkaDelivery\Api\ApiErrorKind;
+use Okay\Modules\Sviat\RozetkaDelivery\Api\AuthFlags;
+use Okay\Modules\Sviat\RozetkaDelivery\Api\RozetkaApiException;
 use Okay\Modules\Sviat\RozetkaDelivery\Parcels\ParcelHistory;
 use Okay\Modules\Sviat\RozetkaDelivery\Parcels\ParcelIssues;
 use Okay\Modules\Sviat\RozetkaDelivery\Parcels\ParcelTracking;
@@ -223,6 +226,130 @@ class ParcelTrackingTest extends TestCase
         $this->details(['id' => self::track(12)]);
         $this->tracking()->tick();
         self::assertSame(1, $this->rows->forOrder(12)->has_paid);
+    }
+
+    /** Видана ЕН з післяплатою, оплату якої Rozetka ще не підтвердила: чек «при отриманні» чекає на `has_paid`. */
+    private function unpaidReceived(int $order, array $values = []): object
+    {
+        return $this->rows->created($order, self::track($order), $values + [
+            'status_group' => 'received', 'cod_amount' => 1000.0, 'has_paid' => 0, 'partial' => 0,
+            'event_at' => $this->ago(86400), 'checked_at' => $this->ago(2 * 3600),
+        ]);
+    }
+
+    private function ago(int $seconds): string
+    {
+        return date('Y-m-d H:i:s', $this->world->now - $seconds);
+    }
+
+    public function testUnpaidCodReceivedRereadUntilPaid(): void
+    {
+        $this->unpaidReceived(1);
+        $this->details(['has_paid' => false]);
+
+        $this->tracking()->tick();
+
+        self::assertSame(['GET /api/track/' . self::track(1)], $this->calls());
+        self::assertSame(0, $this->rows->forOrder(1)->has_paid);
+        self::assertSame(date('Y-m-d H:i:s', $this->world->now), $this->rows->forOrder(1)->checked_at);
+
+        $this->world->now += 3600;
+        $this->details();
+        $summary = $this->tracking()->tick();
+
+        self::assertSame(1, $this->rows->forOrder(1)->has_paid);
+        self::assertSame(1, $summary['extra']);
+        self::assertSame('received', $this->rows->forOrder(1)->status_group, 'група не змінюється');
+
+        $this->world->now += 3600;
+        $this->tracking()->tick();
+        self::assertCount(2, $this->world->http->requests(), 'оплачену більше не перечитують');
+    }
+
+    /** Успішне перечитування доводить, що токен знову працює: попередження про трекінг зникає. */
+    public function testUnpaidRereadClearsTrackingAuthFlag(): void
+    {
+        $this->world->flags->record(AuthFlags::TRACKING, RozetkaApiException::of(ApiErrorKind::BadToken, 'відмова'));
+        $this->unpaidReceived(1);
+        $this->details();
+
+        $this->tracking()->tick();
+
+        self::assertNull($this->world->flags->reason(AuthFlags::TRACKING));
+    }
+
+    public function testUnpaidRereadAtMostHourly(): void
+    {
+        $this->unpaidReceived(1, ['checked_at' => $this->ago(30 * 60)]);
+
+        $this->tracking()->tick();
+
+        self::assertSame([], $this->world->http->requests());
+    }
+
+    public function testUnpaidRereadStopsFourteenDaysAfterReceipt(): void
+    {
+        $this->unpaidReceived(1, ['event_at' => $this->ago(15 * 86400)]);
+        $this->unpaidReceived(2, ['event_at' => $this->ago(13 * 86400), 'has_paid' => null]);
+        $this->details(['id' => self::track(2)]);
+
+        $this->tracking()->tick();
+
+        self::assertSame(['GET /api/track/' . self::track(2)], $this->calls());
+        self::assertSame(1, $this->rows->forOrder(2)->has_paid);
+        self::assertSame(0, $this->rows->forOrder(1)->has_paid);
+    }
+
+    /** Чек на частково видану чи без післяплати не виставляється, тож і бюджет на них не йде. */
+    public function testUnpaidRereadSkipsPartialNonCodAndPaid(): void
+    {
+        $this->unpaidReceived(1, ['partial' => 1]);
+        $this->unpaidReceived(2, ['cod_amount' => 0.0]);
+        $this->unpaidReceived(3, ['has_paid' => 1]);
+        $this->unpaidReceived(4, ['status_group' => 'returned']);
+        $this->rows->rows[$this->unpaidReceived(5)->id]->state = 'uncertain';
+
+        $this->tracking()->tick();
+
+        self::assertSame([], $this->world->http->requests());
+    }
+
+    /** Переходи мають перевагу: перечитування бере лише те, що лишилось від бюджету тіку. */
+    public function testUnpaidRereadUsesOnlyLeftoverBudget(): void
+    {
+        for ($i = 1; $i <= 9; $i++) {
+            $this->rows->created($i, self::track($i), ['status_group' => 'arrived', 'cod_amount' => 500.0]);
+        }
+        for ($i = 21; $i <= 23; $i++) {
+            $this->unpaidReceived($i, ['checked_at' => $this->ago((30 - $i) * 3600)]);
+        }
+        $this->statusAnswer(array_map(static fn(int $i): array => TrackingAnswerTest::item(self::track($i), 60030), range(1, 9)));
+        for ($i = 1; $i <= 10; $i++) {
+            $this->details(['id' => self::track($i)]);
+        }
+
+        $summary = $this->tracking()->tick();
+
+        self::assertSame(10, $summary['extra']);
+        self::assertCount(11, $this->world->http->requests());
+        self::assertSame('GET /api/track/' . self::track(21), $this->calls()[10], 'найдавніше перевірена — першою');
+        self::assertSame(1, $this->rows->forOrder(21)->has_paid);
+        self::assertSame(0, $this->rows->forOrder(22)->has_paid);
+    }
+
+    public function testUnpaidRereadRefusalMarksChecked(): void
+    {
+        $this->unpaidReceived(1);
+        $this->unpaidReceived(2, ['checked_at' => $this->ago(3600)]);
+        $this->world->http->json(404, ['statusCode' => 404, 'message' => 'not found']);
+        $this->details(['id' => self::track(2)]);
+
+        $this->tracking()->tick();
+
+        self::assertCount(2, $this->world->http->requests());
+        self::assertSame(0, $this->rows->forOrder(1)->has_paid);
+        self::assertSame(date('Y-m-d H:i:s', $this->world->now), $this->rows->forOrder(1)->checked_at, 'черга не стоїть на ній');
+        self::assertSame(1, $this->rows->forOrder(2)->has_paid);
     }
 
     public function testUnknownStatusKeepsGroupAndIsRemembered(): void

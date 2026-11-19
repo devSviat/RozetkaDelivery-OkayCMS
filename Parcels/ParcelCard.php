@@ -36,7 +36,7 @@ final class ParcelCard
 
         return [
             'trackId' => $trackId,
-            // Чи приймає `rozetka.delivery/tracking/parcel` номер в URL, не відомо (М16): без підтвердження посилання немає.
+            // Чи приймає `rozetka.delivery/tracking/parcel` номер в URL, не відомо: без підтвердження посилання немає.
             'trackUrl' => null,
             'statusGroup' => $group,
             'statusKey' => $group !== null ? 'sviat__rozetka__parcel_group_' . $group : null,

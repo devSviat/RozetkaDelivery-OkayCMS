@@ -141,21 +141,29 @@ final class ParcelStore implements ParcelRows
         return array_values($this->entity()->order('stale')->find(['unfinished' => $createdSince, 'limit' => $limit]));
     }
 
+    public function unpaidCod(string $eventSince, string $checkedBefore, int $limit): array
+    {
+        return array_values($this->entity()->order('stale')->find([
+            'unpaid_cod' => ['event_since' => $eventSince, 'checked_before' => $checkedBefore],
+            'limit' => $limit,
+        ]));
+    }
+
     public function setReception(array $trackIds, ?int $receptionId): void
     {
         $trackIds = array_values(array_filter($trackIds, is_string(...)));
         if ($trackIds === []) {
             return;
         }
-        foreach ($this->entity()->cols(['id'])->find(['track_id' => $trackIds, 'limit' => count($trackIds)]) as $row) {
-            $this->entity()->update((int)$row->id, ['reception_id' => $receptionId]);
+        foreach ($this->entity()->cols(['id'])->find(['track_id' => $trackIds, 'limit' => count($trackIds)]) ?: [] as $id) {
+            $this->entity()->update((int)$id, ['reception_id' => $receptionId]);
         }
     }
 
     public function clearReception(int $receptionId): void
     {
-        foreach ($this->entity()->cols(['id'])->noLimit()->find(['reception_id' => $receptionId]) as $row) {
-            $this->entity()->update((int)$row->id, ['reception_id' => null]);
+        foreach ($this->entity()->cols(['id'])->noLimit()->find(['reception_id' => $receptionId]) ?: [] as $id) {
+            $this->entity()->update((int)$id, ['reception_id' => null]);
         }
     }
 

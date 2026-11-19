@@ -4,7 +4,7 @@ namespace Okay\Modules\Sviat\RozetkaDelivery\Parcels;
 
 /**
  * Відповідь `GET track/status?id[]=…`. Схема описує `data` як один об'єкт, хоча номерів у запиті кілька, тож
- * приймаються обидві форми (М9).
+ * приймаються обидві форми.
  */
 final class TrackingAnswer
 {

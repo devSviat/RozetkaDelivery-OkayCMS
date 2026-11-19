@@ -23,7 +23,7 @@ final class PopularCities
     {
         $wanted = self::normalize($ids);
         $existing = $wanted === [] ? [] : array_map(
-            static fn(object $row): string => (string)$row->id,
+            strval(...),
             $this->entityFactory->get(CityEntity::class)->cols(['id'])->noLimit()->find(['id' => $wanted]) ?: [],
         );
         self::store($this->state, self::clean($wanted, $existing));

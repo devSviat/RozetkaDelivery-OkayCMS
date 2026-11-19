@@ -12,6 +12,8 @@ final readonly class CodConfig
     public const string FEE_FIXED = 'sviat__rozetka__cod_fee_fixed';
     public const string FEE_PERCENT = 'sviat__rozetka__cod_fee_percent';
     public const string FISCAL = 'sviat__rozetka__cod_fiscal';
+    /** Коли обрано «магазин»: посилки, видані раніше, міг фіскалізувати хтось інший. Читає Checkbox. */
+    public const string FISCAL_SHOP_SINCE = 'sviat__rozetka__cod_fiscal_shop_since';
 
     /** Чек видає магазин (Checkbox). */
     public const string FISCAL_SHOP = 'shop';

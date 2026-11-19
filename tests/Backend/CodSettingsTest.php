@@ -45,4 +45,32 @@ class CodSettingsTest extends TestCase
         self::assertSame(15.03, new CodConfig(true, 15.0, 1.5)->estimateFee(2.0));
         self::assertSame(0.0, new CodConfig(true, 0.0, 0.0)->estimateFee(500.0));
     }
+
+    /**
+     * Checkbox виставляє чеки лише за посилки, видані після переходу на «магазин»: за ті, що видані, поки чек видавав
+     * хтось інший чи вибору не було, другий чек був би хибним.
+     */
+    public function testShopSinceMarksTheSwitch(): void
+    {
+        $settings = new ArraySettings();
+        $now = 1_800_000_000;
+        $cod = new CodSettings($settings, static function () use (&$now): int {
+            return $now;
+        });
+        $save = static fn(string $fiscal): array => $cod->save(['cod_fee_fixed' => '15', 'cod_fee_percent' => '1.5', 'cod_fiscal' => $fiscal]);
+
+        $save('provider');
+        self::assertEmpty($settings->get(CodConfig::FISCAL_SHOP_SINCE));
+
+        $save('shop');
+        self::assertSame(date('Y-m-d H:i:s', 1_800_000_000), $settings->get(CodConfig::FISCAL_SHOP_SINCE));
+
+        $now += 3600;
+        $save('shop');
+        self::assertSame(date('Y-m-d H:i:s', 1_800_000_000), $settings->get(CodConfig::FISCAL_SHOP_SINCE), 'повторне збереження дати не зсуває');
+
+        $save('unknown');
+        self::assertEmpty($settings->get(CodConfig::FISCAL_SHOP_SINCE));
+        self::assertSame('sviat__rozetka__cod_fiscal_shop_since', CodConfig::FISCAL_SHOP_SINCE, 'цю назву читає Checkbox');
+    }
 }

@@ -127,4 +127,71 @@ class ParcelStoreTest extends TestCase
 
         self::assertFalse($this->store($entity)->attach(1042, self::attached()));
     }
+
+    /** Сутність з однією колонкою в cols() віддає значення, а не рядки: так відповідає справжня база. */
+    public function testSetReceptionUpdatesFoundIds(): void
+    {
+        $entity = $this->createStub(ParcelEntity::class);
+        $entity->method('cols')->willReturnSelf();
+        $entity->method('find')->willReturn(['4', '9']);
+        $updated = [];
+        $entity->method('update')->willReturnCallback(static function (int $id, array $values) use (&$updated): bool {
+            $updated[$id] = $values;
+
+            return true;
+        });
+
+        $this->store($entity)->setReception(['101123456789', '101123456790'], 55);
+
+        self::assertSame([4 => ['reception_id' => 55], 9 => ['reception_id' => 55]], $updated);
+    }
+
+    public function testClearReceptionUpdatesFoundIds(): void
+    {
+        $entity = $this->entity();
+        $entity->method('cols')->willReturnSelf();
+        $entity->method('noLimit')->willReturnSelf();
+        $entity->method('find')->willReturn(['4']);
+        $entity->expects(self::once())->method('update')->with(4, ['reception_id' => null]);
+
+        $this->store($entity)->clearReception(55);
+    }
+
+    /** Чек «при отриманні» чекає саме на ці ЕН: частково видані й без післяплати сюди не входять. */
+    public function testUnpaidCodFilter(): void
+    {
+        $recorder = new class {
+            /** @var list<string> */
+            public array $where = [];
+            /** @var array<string, mixed> */
+            public array $bound = [];
+
+            public function where(string $sql): static
+            {
+                $this->where[] = $sql;
+
+                return $this;
+            }
+
+            public function bindValue(string $name, mixed $value): static
+            {
+                $this->bound[$name] = $value;
+
+                return $this;
+            }
+        };
+        $entity = new \ReflectionClass(ParcelEntity::class)->newInstanceWithoutConstructor();
+        new \ReflectionProperty(ParcelEntity::class, 'select')->setValue($entity, $recorder);
+        new \ReflectionMethod(ParcelEntity::class, 'filter__unpaid_cod')->invoke($entity, ['event_since' => '2026-11-03 10:00:00', 'checked_before' => '2026-11-17 09:00:00']);
+        $where = implode(' AND ', $recorder->where);
+
+        self::assertStringContainsString("rzprc.state = 'created'", $where);
+        self::assertStringContainsString("rzprc.status_group = 'received'", $where);
+        self::assertStringContainsString('rzprc.partial = 0', $where);
+        self::assertStringContainsString('rzprc.cod_amount > 0', $where);
+        self::assertStringContainsString('(rzprc.has_paid IS NULL OR rzprc.has_paid <> 1)', $where);
+        self::assertStringContainsString('rzprc.event_at >= :rozetka_unpaid_event_since', $where);
+        self::assertStringContainsString('(rzprc.checked_at IS NULL OR rzprc.checked_at <= :rozetka_unpaid_checked_before)', $where);
+        self::assertSame(['rozetka_unpaid_event_since' => '2026-11-03 10:00:00', 'rozetka_unpaid_checked_before' => '2026-11-17 09:00:00'], $recorder->bound);
+    }
 }

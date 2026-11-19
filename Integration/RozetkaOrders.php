@@ -71,9 +71,9 @@ final class RozetkaOrders
      */
     public function receivedCodSince(string $since): array
     {
-        $rows = $this->entityFactory->get(ParcelEntity::class)->noLimit()->cols(['order_id'])->find(['received_cod_since' => $since]);
+        $ids = $this->entityFactory->get(ParcelEntity::class)->noLimit()->cols(['order_id'])->find(['received_cod_since' => $since]);
 
-        return array_values(array_map(static fn(object $row): int => (int)$row->order_id, $rows));
+        return array_values(array_unique(array_map(intval(...), $ids)));
     }
 
     /** Повний підзапит, а не назва таблиці: споживачі не мають знати її колонок. */

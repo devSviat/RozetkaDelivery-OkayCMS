@@ -205,7 +205,7 @@ return [
     ],
     CodSettings::class => [
         'class' => CodSettings::class,
-        'arguments' => [new SR(Settings::class)],
+        'arguments' => [new SR(Settings::class), $now],
     ],
     CodPayments::class => [
         'class' => CodPayments::class,
