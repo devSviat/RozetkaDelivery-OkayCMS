@@ -148,7 +148,9 @@ final class ParcelDrafts
         if ($inTotal && $price > 0) {
             return ['sender', 'in_total'];
         }
-        if (($snapshot->price_source ?? null) === 'free' || $inTotal) {
+        // Лише позначка кошика: замовлення з адмінки чи інших джерел з нульовою доставкою безкоштовної не обіцяли.
+        $source = $snapshot->price_source ?? null;
+        if ($source === 'free' || ($source === 'external' && $price <= 0)) {
             return ['sender', 'free'];
         }
 

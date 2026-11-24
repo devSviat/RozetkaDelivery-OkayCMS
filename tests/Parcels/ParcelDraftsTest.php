@@ -36,6 +36,19 @@ class ParcelDraftsTest extends TestCase
         self::assertSame(['sender', 'free'], [$promo->payer, $promo->payerReason], 'a promo that made delivery free in the total');
     }
 
+    /** «Безкоштовно» лише за позначкою кошика: замовлення з адмінки чи інших джерел з нульовою доставкою нічого не обіцяли. */
+    public function testFreeOnlyByTheCartMark(): void
+    {
+        $promo = F::draft(['order' => F::order(['separate_delivery' => 1, 'delivery_price' => 0.0]), 'snapshot' => (object)['price_source' => 'external']]);
+        self::assertSame(['sender', 'free'], [$promo->payer, $promo->payerReason], 'a promo, delivery paid apart');
+
+        $foreign = F::draft(['order' => F::order(['separate_delivery' => 0, 'delivery_price' => 0.0]), 'snapshot' => (object)['price_source' => null]]);
+        self::assertSame(['receiver', 'setting'], [$foreign->payer, $foreign->payerReason], 'admin or another source, price 0 in the total');
+
+        $changed = F::draft(['order' => F::order(['separate_delivery' => 1, 'delivery_price' => 80.0]), 'snapshot' => (object)['price_source' => 'external']]);
+        self::assertSame('receiver', $changed->payer, 'a promo that changed but did not zero the price');
+    }
+
     public function testSettingWhenSeparate(): void
     {
         $receiver = F::draft();

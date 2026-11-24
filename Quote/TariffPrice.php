@@ -18,6 +18,7 @@ final class TariffPrice
             return new DeliveryQuote(0.0, 'receiver', $config->receiverPriceNote ? $config->cartPrice : null);
         }
 
-        return new DeliveryQuote($config->cartPrice, 'tariff');
+        // Нульовий тариф кошик показує як безкоштовну доставку: це така сама обіцянка, як поріг.
+        return $config->cartPrice > 0 ? new DeliveryQuote($config->cartPrice, 'tariff') : new DeliveryQuote(0.0, 'free');
     }
 }

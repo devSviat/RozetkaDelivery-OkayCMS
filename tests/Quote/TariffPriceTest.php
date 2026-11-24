@@ -38,6 +38,16 @@ class TariffPriceTest extends TestCase
         self::assertSame('free', $free->source);
     }
 
+    /** Тариф кошика 0: покупець бачить безкоштовну доставку, тож це обіцянка, як і поріг. */
+    public function testZeroCartPriceIsFree(): void
+    {
+        $quote = TariffPrice::quote(self::delivery(), self::config([ShippingConfig::CART_PRICE => '0']), 900.0);
+
+        self::assertSame(0.0, $quote->price);
+        self::assertSame('free', $quote->source);
+        self::assertSame('receiver', TariffPrice::quote(self::delivery(['separate_payment' => 1]), self::config([ShippingConfig::CART_PRICE => '0']), 900.0)->source, 'control: the receiver still pays apart');
+    }
+
     public function testSeparatePaymentIsReceiverZero(): void
     {
         $quote = TariffPrice::quote(self::delivery(['separate_payment' => 1]), self::config(), 900.0);
